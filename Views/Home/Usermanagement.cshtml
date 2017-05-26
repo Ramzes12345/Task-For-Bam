@@ -1,0 +1,60 @@
+﻿@{
+    ViewBag.Title = "User Management";
+}
+<h2>User management</h2>
+
+
+
+
+<input type="button" value="refresh data" onclick="GetData()" />
+<br/>
+<label>Opened sessions:</label>
+<br/>
+<div id="AllElementsUsers">
+
+</div>
+<br/>
+@section Scripts {
+    @Scripts.Render("~/scripts/validate.min.js")
+
+    <script type="text/javascript">
+
+        function GetData(element) {
+            var userName = $(element).attr('user');
+            data = {
+                userName: userName
+            };
+            data = JSON.stringify(data, null, 4);
+            $.ajax({
+                type: "POST",
+                url: "/Account/getDataAll",
+                contentType: "application/json; charset=utf-8",
+                dataType: "json",
+                data: data,
+                success: function (json) {
+                    var insertTable = '<table>';
+                    for (var i in json.AllUsers) {
+                        insertTable = insertTable + '<tr class="tabletrclass"><td class="tabletrclass" align="left">' + json.AllUsers[i] + '</td><td><input user="' + json.AllUsers[i] + '" type="button" value="close session" onclick="GetData(this)"/></td></tr>';
+                    }
+
+                    var insertTable = insertTable + '</table>';
+                    $("#AllElementsUsers").empty();
+                    $("#AllElementsUsers").append(insertTable);
+                },
+                error: function () {
+                    
+                    alert('Error');
+                }
+            });
+        }
+        var tidR = setTimeout(mycodeReload, 5000);
+        function mycodeReload() {
+            GetData();
+            tid = setTimeout(mycodeReload, 5000);
+        }
+    
+        $(document).ready(function () {
+            GetData();
+        });
+    </script>
+}
